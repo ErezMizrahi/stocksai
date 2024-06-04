@@ -1,0 +1,22 @@
+### get all symbols
+GET http://localhost:3000/stocks/symbols?query=qqq
+
+### add like to symbols
+POST http://localhost:3000/stocks/add-symbol
+Content-Type: application/json
+
+{
+    "likedSymbols": ["amzn", "appl"]
+}
+
+### get all symbols data
+GET http://localhost:3000/stocks/my-stocks
+
+### get spesifc symbol history
+GET http://localhost:3000/stocks/stock-history?symbol=AMZN&days=1000
+
+### get spesifc symbol history news
+GET http://localhost:3000/stocks/news-history?symbol=FFIE&days=10
+
+### get spesifc symbol opinion from huggingface
+GET http://localhost:3000/stocks/ask-ai?symbol=AMZN

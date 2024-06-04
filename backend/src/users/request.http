@@ -1,0 +1,47 @@
+
+### signup a user
+POST http://localhost:3000/auth/signup
+Content-Type: application/json
+
+{
+    "email": "test2@gmail.com",
+    "password": "213412k4l2j"
+}
+
+
+### sign in a user
+POST http://localhost:3000/auth/signin
+Content-Type: application/json
+
+{
+    "email": "test2@gmail.com",
+    "password": "213412k4l2j"
+}
+
+
+### get currently signed in user
+GET http://localhost:3000/auth/whoami
+
+### sign out a user
+POST http://localhost:3000/auth/signout
+Content-Type: application/json
+
+
+### find user by id
+GET http://localhost:3000/auth/2
+
+
+### find all users by email
+GET http://localhost:3000/auth?email=erez@gmail.com
+
+
+###delete user by id
+DELETE http://localhost:3000/auth/1
+
+###update user by id
+PATCH http://localhost:3000/auth/2
+Content-Type: application/json
+
+{
+    "password": "aaa"
+}

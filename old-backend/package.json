@@ -1,0 +1,21 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "ts-node-dev --poll src/index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@alpacahq/alpaca-trade-api": "^3.0.1",
+    "@tensorflow/tfjs-node": "^4.17.0",
+    "dotenv": "^16.4.5",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.4.4",
+    "ws": "^8.16.0"
+  }
+}
