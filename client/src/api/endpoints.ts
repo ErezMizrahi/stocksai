@@ -18,7 +18,7 @@ export const endpoints: Record<string, Endpoint> = {
         method: 'POST', 
     },
     whoami: { 
-        uri: '/whoami', 
+        uri: '/auth/whoami', 
         method: 'GET'
     },
     login: { 
@@ -32,5 +32,9 @@ export const endpoints: Record<string, Endpoint> = {
     getNewsHistory: { 
         uri: '/stocks/news-history', 
         method: 'GET', 
+    },
+    askAi: { 
+        uri: '/stocks/ask-ai', 
+        method: 'POST', 
     },
 }

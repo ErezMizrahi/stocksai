@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom';
 import { Stock as StockType } from '../types/Ticker';
 import { CartesianGrid, Line, LineChart, XAxis, YAxis, ResponsiveContainer, Tooltip, ReferenceLine, Brush, BarChart, Bar } from 'recharts';
@@ -7,6 +7,9 @@ import stocksApi from '../api/stocks.api';
 import { queryKeys } from '../utils/queryKeys';
 import NewsList from '../components/NewsList';
 import { ChipsUL } from '../components/styled/Chips.styled';
+import { useNavigate } from 'react-router-dom';
+import { endpoints } from '../api/endpoints';
+import { useAuth } from '../hooks/useAuth';
 
 const possibleDays = [{name: '1D', numberOfDays: 1}, {name: '5D', numberOfDays: 5},{name: '1M', numberOfDays: 30},{name: '6M', numberOfDays: 180}, {name: '1Y', numberOfDays: 365}, {name: '5Y', numberOfDays: 1825},];
 
@@ -14,14 +17,91 @@ const Stock = () => {
     const { state } = useLocation();
     const stock: StockType  = state.stock;
     const queryClient = useQueryClient();
+    const navigate = useNavigate();
+    const auth = useAuth();
 
     const [days, setDays] = useState(possibleDays[4].numberOfDays);
+    const [askAiData, setAskAiData] = useState('');
+    const [loading, setLoading] = useState(false);
+   
+    
 
+    useEffect(() => {
+      const getData = async () => {
+        setLoading(true);
+        const response = await fetch(endpoints.askAi.uri, { method: endpoints.askAi.method , headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${auth.token?.replace(/\"/g, "")}`
+        },
+        body: JSON.stringify({ symbol: stock.symbol })
+      });
+
+        const reader = response.body?.getReader();
+
+        const read = () => {
+          reader?.read().then(({ done, value }) => {
+            if(done) {
+              console.log('end....');
+              setLoading(false);
+              return;
+            }
+
+            const decoder = new TextDecoder();
+            setAskAiData(prev => `${prev}${decoder.decode(value)}`);
+            read();
+          })
+        }
+
+        read();
+      }
+
+      getData();
+    }, [])
+   
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const response = await stocksApi.getAskAi('AAPL');
+
+  //       const reader = response.body?.getReader(); // Get the reader from the body
+
+  //       if (reader) {
+  //         let result = '';
+
+  //         // Read chunks of data from the stream
+  //         while (true) {
+  //           const { done, value } = await reader.read();
+
+  //           if (done) {
+  //             break;
+  //           }
+
+  //           result += new TextDecoder().decode(value);
+  //           setAskAiData(result);
+  //         }
+  //       }
+  //     } catch (error) {
+  //       console.error('Error fetching streaming data:', error);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
     const { data } = useQuery({
         queryKey: [ queryKeys.spesific, days ],
-        queryFn: ({signal}) => { return stocksApi.getStockHistory(stock.symbol, days, signal) },
-        keepPreviousData: true
+        queryFn: ({signal}) => {
+            return stocksApi.getStockHistory(stock.symbol, days, signal)
+         },
+        keepPreviousData: true,
+        onError: (e: any) => {
+            if(e.response?.status === 401) {
+              navigate('/login', { replace: true });
+            }
+          }
       });
+
+
+      
 
       const mutation = useMutation({
         mutationKey: [ queryKeys.spesific, days ],
@@ -31,7 +111,12 @@ const Stock = () => {
         onSuccess: (newData, variables) => {
             setDays(variables);
             queryClient.setQueryData([queryKeys.spesific, variables], newData);
-        }
+        },
+        onError: (e: any) => {
+            if(e.response?.status === 401) {
+              navigate('/login', { replace: true });
+            }
+          }
       });
 
   return (
@@ -40,6 +125,7 @@ const Stock = () => {
 
         <div>
             <h3> what does stockAI thinks?</h3>
+            {askAiData}
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'row', justifyContent:'space-between', alignItems: 'center', gap: '10px'}}>

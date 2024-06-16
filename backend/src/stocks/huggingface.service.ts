@@ -11,11 +11,12 @@ export class HFService {
 
   async generateResponse(prompt: string): Promise<any> {
     try {
-      const response = await this.hf.textGenerationStream({
+      const response = this.hf.textGenerationStream({
         model: 'tiiuae/falcon-7b-instruct',
         inputs: `${prompt}`,
         parameters: {
             max_new_tokens: 512,
+            // max_new_tokens: 100,
             return_full_text: false,
             temperature: 1.0,
         }

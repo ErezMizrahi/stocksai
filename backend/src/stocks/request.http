@@ -11,12 +11,20 @@ Content-Type: application/json
 
 ### get all symbols data
 GET http://localhost:3000/stocks/my-stocks
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWF0IjoxNzE4MDA3NzY2LCJleHAiOjE3MTgwMTEzNjZ9.tZu7wPH76n191LoIarFIV2Z7UoWVf3TzVaf0NN5p_Qg
+
 
 ### get spesifc symbol history
 GET http://localhost:3000/stocks/stock-history?symbol=AMZN&days=1000
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWF0IjoxNzE4MDA3NzY2LCJleHAiOjE3MTgwMTEzNjZ9.tZu7wPH76n191LoIarFIV2Z7UoWVf3TzVaf0NN5p_Qg
 
 ### get spesifc symbol history news
 GET http://localhost:3000/stocks/news-history?symbol=FFIE&days=10
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWF0IjoxNzE4MDA3NzY2LCJleHAiOjE3MTgwMTEzNjZ9.tZu7wPH76n191LoIarFIV2Z7UoWVf3TzVaf0NN5p_Qg
 
 ### get spesifc symbol opinion from huggingface
-GET http://localhost:3000/stocks/ask-ai?symbol=AMZN
+POST http://localhost:3000/stocks/ask-ai?symbol=AAPL
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWF0IjoxNzE4NTQwMDkwLCJleHAiOjE3MTg1NDM2OTB9.SYOYFbLJ9xgtM2XLxHG9AJu8NxGMKImIwWgpL_x2W9c
+
+
+

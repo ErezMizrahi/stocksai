@@ -21,10 +21,11 @@ Content-Type: application/json
 
 ### get currently signed in user
 GET http://localhost:3000/auth/whoami
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWF0IjoxNzE4MDIxMzkwLCJleHAiOjE3MTgwMjQ5OTB9.1vf_ahkFvSZIvykU8wJbFisM6XE5oFwnfVijj9oOMgE
 
-### sign out a user
-POST http://localhost:3000/auth/signout
-Content-Type: application/json
+# ### sign out a user
+# POST http://localhost:3000/auth/signout
+# Content-Type: application/json
 
 
 ### find user by id

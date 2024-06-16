@@ -15,6 +15,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AlpacaProvider } from './stocks/alpaca.provider';
 import { HFProvider } from './stocks/huggingface.provider';
 import { HFService } from './stocks/huggingface.service';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -27,6 +28,12 @@ import { HFService } from './stocks/huggingface.service';
         entities: [User, LikedStocks]
     }) 
   }),
+   
+  JwtModule.register({
+    global: true,
+    secret: 'secret',
+    signOptions: { expiresIn: '1h' },
+  }), 
     StocksModule,
     UsersModule,
     ConfigModule.forRoot({ isGlobal: true, envFilePath: `.env.${process.env.NODE_ENV}`})

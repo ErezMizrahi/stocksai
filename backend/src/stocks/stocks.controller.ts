@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Res, StreamableFile, UseGuards } from '@nestjs/common';
 import { StocksService } from './stocks.service';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { AddLikedSymbolsDto } from './dtos/addLikedSymbolsDto.dto';
@@ -7,7 +7,8 @@ import { User } from 'src/users/user.entity';
 import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { LikedSymbolsDTO } from 'src/stocks/dtos/liked-symbols.dto';
 import { HFService } from './huggingface.service';
-import { Response } from 'express';
+import type { Response } from 'express';
+import * as fastcsv from 'fast-csv';
 
 @Controller('stocks')
 @UseGuards(AuthGuard)
@@ -42,17 +43,19 @@ export class StocksController {
         return this.stocksService.getNewsHistory(symbol, numberOfDaysAgo);
     }
 
-    @Get('/ask-ai')
-    async getStocksAiOpinionOnStock(@Query('symbol') symbol, @Res() res: Response) {
-        res.setHeader('Content-Type', 'text/plain');
-        res.flushHeaders();
+    @Post('/ask-ai')
+    async getStocksAiOpinionOnStock(@Body() body: {symbol: string}, @Res() res: Response) {
+        console.log('symbol', body.symbol)
 
-        const response = await this.hfService.generateResponse(`improve this propmt Analyze the stock performance of ${symbol}. include summarized fundamentals analysis and other key metrics.`);
-        for await(const chunk of response) {
-            res.write(chunk.token.text);
-            await new Promise(resolve => setTimeout(resolve, 100)); // Adjust delay as needed
+        const data = await this.hfService.generateResponse(`improve this propmt Analyze the stock performance of ${body.symbol}. include summarized fundamentals analysis and other key metrics.`);
+        for await (const chunk of data) {
+            if(chunk.token.text !=='<|endoftext|>') {
+                res.write(chunk.token.text);
+            }
+            await new Promise(resolve => setTimeout(resolve, 50));
         }
-    
+
         res.end();
+  
     }
 }

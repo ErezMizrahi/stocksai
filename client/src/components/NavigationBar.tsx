@@ -26,7 +26,8 @@ const NavigationBar = () => {
     }, [])
     
     const handlelogout = async () => {
-      await auth.logout();
+      auth.setAccessToken(null);
+      auth.setUser(null);
       navigate('/login', { replace: true });
     }
 

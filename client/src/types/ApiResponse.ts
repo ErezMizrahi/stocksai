@@ -1,4 +1,5 @@
 export interface ApiResponse {
     success?: any,
-    error?: any
+    error?: any,
+    response?: any
 }

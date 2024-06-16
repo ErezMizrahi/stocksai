@@ -6,6 +6,8 @@ import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from '../hooks/useAuth';
 import Logo from '../components/Logo';
 import userApi from '../api/user.api';
+import useLocalstorage from '../hooks/useLocalstorage';
+import { setHeaderToken } from '../utils/client';
 
 const schema = z.object({
     email: z.string().email(),
@@ -17,7 +19,7 @@ type FormFields = z.infer<typeof schema>;
 const Login = () => {
     const { register, handleSubmit, setError, formState: { errors, isSubmitting } } = useForm<FormFields>({ resolver: zodResolver(schema)});
     const navigate = useNavigate();
-    const { user, setUser } = useAuth();
+    const { user, setUser, setAccessToken } = useAuth();
 
     const onSubmit: SubmitHandler<FormFields> = async (data) => {
         try {
@@ -25,6 +27,7 @@ const Login = () => {
 
             if (response.success) {
                 console.log('Login successful');
+                setAccessToken(response.success.access_token)
                 setUser(response.success);
                 navigate('/dashboard', { replace: true });
                 

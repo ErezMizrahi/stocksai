@@ -1,10 +1,10 @@
 const useLocalstorage = () => {
 
     const setItem = (item: any) => {
-        localStorage.setItem('presist', JSON.stringify(item));
+        localStorage.setItem('accessToken', JSON.stringify(item));
     }
 
-    const getItem= (): boolean => localStorage.getItem('presist') === 'true';
+    const getItem = (): string | null => localStorage.getItem('accessToken');
 
     return { getItem, setItem };
 }

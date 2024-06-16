@@ -39,6 +39,16 @@ class StocksApi extends ApiBase {
         console.log(json)
         return json.success;
     }
+
+    async getAskAi(symbol: string): Promise<Response> {
+    try {
+      const {response} = await this.requestHandler<Response>(endpoints.askAi, { symbol }, undefined, 'json');
+      return response; // Return the entire response object
+    } catch (error) {
+      console.error('Error fetching streaming data:', error);
+      throw error;
+    }
+  }
 }
 
 

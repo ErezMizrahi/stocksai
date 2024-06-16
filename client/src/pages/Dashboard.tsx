@@ -15,7 +15,12 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const { data } = useQuery({
     queryKey: [ queryKeys.myStocksData ],
-    queryFn: ({signal}) => { return stocksApi.getLikedStockData(signal) }
+    queryFn: ({signal}) => { return stocksApi.getLikedStockData(signal) },
+    onError: (e: any) => {
+      if(e.response?.status === 401) {
+        navigate('/login', { replace: true });
+      }
+    }
   });
   
   const HoverIcon = ({percentage}: {percentage: string}): JSX.Element => {

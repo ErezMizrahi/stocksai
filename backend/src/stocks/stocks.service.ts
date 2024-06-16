@@ -61,10 +61,7 @@ export class StocksService {
     }
 
     async findUser(userData: Partial<User>) {
-        console.log('userdata', userData)
         const existingUser = await this.repo.findOne({ where: {user: {id: userData.id}} });
-        console.log('existingUser', existingUser)
-
         return existingUser;
     }
 
@@ -103,7 +100,6 @@ export class StocksService {
 
         date.setDate(date.getDate() - days);
         const yesterday = date.toISOString().split('T')[0];
-        console.log('yesterday', yesterday, 'days', days, isOpen)
 
         const barsMap: Map<string, Bar[]> = await this.alpaca.getMultiBarsV2(existingUserSymbols.likedSymbols, {
             start: yesterday,
@@ -127,7 +123,6 @@ export class StocksService {
         date.setDate(date.getDate() - numberOfDays);
 
         const yesterday = date.toISOString().split('T')[0];
-        console.log(yesterday)
 
         const barsMap: Bar[] = await this.alpaca.getBarsV2(symbol, {
             start: yesterday,
@@ -145,9 +140,6 @@ export class StocksService {
     }
 
     private procceesStock(stocks: Stock[], symbol: string, value: Bar | Bar[]) {
-        // const stocks: Stock[] = [];
-
-        // for (let [key, value] of barsMap) {
             let latestValue: Bar = null;
             if(Array.isArray(value)) {
                 latestValue = this.getBarLatestByTimestamp(value);
@@ -166,8 +158,6 @@ export class StocksService {
                 percent: changePercent
             };
             stocks.push(stock);
-        // }
-    
         return stocks;
     }
     
@@ -196,8 +186,6 @@ export class StocksService {
             end: new Date().toISOString().split('T')[0] + 'T06:00:00Z',
             sort: 'desc'
         })
-
-        console.log(news);
 
         return news;
     }
