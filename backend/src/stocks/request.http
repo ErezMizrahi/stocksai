@@ -23,8 +23,14 @@ GET http://localhost:3000/stocks/news-history?symbol=FFIE&days=10
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWF0IjoxNzE4MDA3NzY2LCJleHAiOjE3MTgwMTEzNjZ9.tZu7wPH76n191LoIarFIV2Z7UoWVf3TzVaf0NN5p_Qg
 
 ### get spesifc symbol opinion from huggingface
-POST http://localhost:3000/stocks/ask-ai?symbol=AAPL
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWF0IjoxNzE4NTQwMDkwLCJleHAiOjE3MTg1NDM2OTB9.SYOYFbLJ9xgtM2XLxHG9AJu8NxGMKImIwWgpL_x2W9c
+POST http://localhost:3000/stocks/ask-ai
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWF0IjoxNzE4NTQ0MTg5LCJleHAiOjE3MTg1NDc3ODl9.abc9fdZ2ZbDNUQvH0yoNqVex1Vn1SUojxNEXzrxfb5A
+
+
+{
+    "symbol": "SPY"
+}
 
 
 

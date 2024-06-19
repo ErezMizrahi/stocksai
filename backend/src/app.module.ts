@@ -22,10 +22,14 @@ import { JwtModule } from '@nestjs/jwt';
     TypeOrmModule.forRootAsync({ 
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        type: 'sqlite',
-        database: configService.get<string>('DB_NAME'),
+        type: 'postgres',
+        host: configService.get<string>('POSTGRES_HOST'),
+        username: configService.get<string>('POSTGRES_USER'),
+        password: configService.get<string>('POSTGRES_PASSWORD'),
+        database: configService.get<string>('POSTGRES_DATABASE'),
+        url: configService.get<string>('POSTGRES_URL'),
         synchronize: true,
-        entities: [User, LikedStocks]
+        entities: [User, LikedStocks],
     }) 
   }),
    

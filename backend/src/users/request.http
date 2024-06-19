@@ -1,6 +1,6 @@
 
 ### signup a user
-POST http://localhost:3000/auth/signup
+POST https://stocksai-backend.vercel.app/auth/signup
 Content-Type: application/json
 
 {
