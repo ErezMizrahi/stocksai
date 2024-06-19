@@ -7,7 +7,6 @@ import Logo from '../components/Logo';
 import userApi from '../api/user.api';
 import { useAuth } from '../hooks/useAuth';
 import useLocalstorage from '../hooks/useLocalstorage';
-import { setHeaderToken } from '../utils/client';
 
 const schema = z.object({
     email: z.string().email(),
@@ -23,7 +22,7 @@ type FormFields = z.infer<typeof schema>;
 const Signup = () => {
     const { register, handleSubmit, setError, formState: { errors, isSubmitting } } = useForm<FormFields>({ resolver: zodResolver(schema)});
     const navigate = useNavigate();
-    const { setUser } = useAuth();
+    const { setUser, setAccessToken } = useAuth();
     const { setItem } = useLocalstorage();
 
     const onSubmit: SubmitHandler<FormFields> = async (data: Omit<FormFields, 'confirmPassword'>) => {
@@ -32,7 +31,7 @@ const Signup = () => {
 
             if (response.success) {
                 console.log('Signup successful');
-                setHeaderToken(response.success.access_token)
+                setAccessToken(response.success.access_token)
                 setUser(response.success);
                 navigate('/dashboard', { replace: true })
             } else {
