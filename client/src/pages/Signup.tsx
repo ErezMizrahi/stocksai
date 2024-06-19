@@ -55,12 +55,12 @@ const Signup = () => {
             </div>
             
             <div className='input-container'>
-                <input {...register('password')} type='text' name='password' placeholder='password'/>
+                <input {...register('password')} type='password' name='password' placeholder='password'/>
                 {errors.password && <div className='error'> {errors.password.message} </div>}
             </div>
 
             <div className='input-container'>
-                <input {...register('confirmPassword')} type='text' name='confirmPassword' placeholder='confirm password'/>
+                <input {...register('confirmPassword')} type='password' name='confirmPassword' placeholder='confirm password'/>
                 {errors.confirmPassword && <div className='error'> {errors.confirmPassword.message} </div>}
             </div>
             

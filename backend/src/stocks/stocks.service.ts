@@ -89,7 +89,11 @@ export class StocksService {
     }
 
     async getMyStocksData(user: User) {
-        const existingUserSymbols = await this.findUser(user);
+        const existingUser = await this.findUser(user);
+        if(!existingUser || existingUser.likedSymbols.length < 1) {
+            return [];
+        }
+        
         const { isOpen, nextOpen } = await this.getMarketHours();
         let days = 0;
         const date = new Date();
@@ -101,7 +105,7 @@ export class StocksService {
         date.setDate(date.getDate() - days);
         const yesterday = date.toISOString().split('T')[0];
 
-        const barsMap: Map<string, Bar[]> = await this.alpaca.getMultiBarsV2(existingUserSymbols.likedSymbols, {
+        const barsMap: Map<string, Bar[]> = await this.alpaca.getMultiBarsV2(existingUser.likedSymbols, {
             start: yesterday,
             end: new Date().toISOString().split('T')[0] + 'T06:00:00Z',
             timeframe: '1day',

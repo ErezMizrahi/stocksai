@@ -28,8 +28,6 @@ export class StocksController {
 
     @Get('/my-stocks')
     async getMyStocksData(@CurrentUser() user: User) {
-        const res = await this.hfService.generateResponse('hey there how are you?');
-        console.log('res', res);
         return this.stocksService.getMyStocksData(user);
     }
 

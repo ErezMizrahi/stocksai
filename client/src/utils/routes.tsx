@@ -8,7 +8,6 @@ import Stock from "../pages/Stock";
 
 export const routes = [
     {
-      path: '/',
       element: <Layout />,
       namespace: 'protected',
       children: [

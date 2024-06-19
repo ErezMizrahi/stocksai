@@ -51,12 +51,12 @@ const Login = () => {
             <Logo />
             
             <div className='input-container'>
-                <input {...register('email')} type="text" name='email' placeholder='email address' />
+                <input {...register('email')} type="email" name='email' placeholder='email address' autoComplete='email' />
                 {errors.email && <div className='error'> {errors.email.message} </div>}
             </div>
             
             <div className='input-container'>
-                <input {...register('password')} type='text' name='password' placeholder='password'/>
+                <input {...register('password')} type='password' name='password' placeholder='password' autoComplete='current-password'/>
                 {errors.password && <div className='error'> {errors.password.message} </div>}
             </div>
             

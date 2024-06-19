@@ -22,19 +22,19 @@ const Layout = () => {
           setUser(userInfo);
           return userInfo
       } 
-  },
-  enabled: token != undefined && token != null,
-  cacheTime: 0,
-  staleTime: 0,
-  onSuccess: () => {
-    queryClient.invalidateQueries([queryKeys.myStocksData])
-  },
-  onError: (e: any) => {
-    if(e.response?.status === 401) {
-      navigate('/login', { replace: true });
+    },
+    enabled: token != undefined && token != null,
+    cacheTime: 0,
+    staleTime: 0,
+    onSuccess: () => {
+      queryClient.invalidateQueries([queryKeys.myStocksData])
+    },
+    onError: (e: any) => {
+      if(e.response?.status === 401) {
+        navigate('/login', { replace: true });
+      }
     }
-  }
-  })
+    })
 
   if(isLoading){
     return <div>
