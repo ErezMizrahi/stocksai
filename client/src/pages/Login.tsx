@@ -29,7 +29,7 @@ const Login = () => {
                 console.log('Login successful');
                 setAccessToken(response.success.access_token)
                 setUser(response.success);
-                navigate('/dashboard', { replace: true });
+                navigate('/', { replace: true });
                 
             } else {
                 const { message } = response.error;
@@ -42,7 +42,7 @@ const Login = () => {
     }
 
     if(user){
-        return <Navigate to="/dashboard" />
+        return <Navigate to="/" />
     }
 
   return (

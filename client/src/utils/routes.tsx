@@ -12,7 +12,7 @@ export const routes = [
       namespace: 'protected',
       children: [
         {
-          path: '/dashboard',
+          path: '/',
           element: (
             <ProtectedRoute>
               <Dashboard />

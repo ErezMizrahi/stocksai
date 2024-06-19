@@ -33,7 +33,7 @@ const Signup = () => {
                 console.log('Signup successful');
                 setAccessToken(response.success.access_token)
                 setUser(response.success);
-                navigate('/dashboard', { replace: true })
+                navigate('/', { replace: true })
             } else {
                 const { message } = response.error;
                 setError('email', { message}); 
