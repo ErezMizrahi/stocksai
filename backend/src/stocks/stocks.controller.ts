@@ -45,7 +45,9 @@ export class StocksController {
 
     @Post('/ask-ai')
     async getStocksAiOpinionOnStock(@Body() body: {symbol: string}, @Res() res: Response) {
-        console.log('symbol', body.symbol)
+        res.setHeader('Transfer-Encoding', 'chunked');
+        res.setHeader('Connection', 'keep-alive');
+        res.flushHeaders();
 
         const data = await this.hfService.generateResponse(`improve this propmt Analyze the stock performance of ${body.symbol}. include summarized fundamentals analysis and other key metrics.`);
         for await (const chunk of data) {

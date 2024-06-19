@@ -6,11 +6,22 @@
         "use": "@vercel/node"
       }
     ],
-    "routes": [
+    "rewrites": [
+      { "source": "/(.*)", "destination": "dist/main.js" }
+    ],
+    "headers": [
       {
-        "src": "/(.*)",
-        "dest": "dist/main.js",
-        "methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"]
+        "source": "/stocks/ask-ai",
+        "headers": [
+          {
+            "key": "Transfer-Encoding",
+            "value": "chunked"
+          },
+          {
+            "key": "Connection",
+            "value": "keep-alive"
+          }
+        ]
       }
     ]
   }

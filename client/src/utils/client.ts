@@ -3,7 +3,7 @@ import axios, { AxiosRequestConfig } from "axios";
 
 
 export const client = axios.create({
-  baseURL: "https://stocksai-backend.vercel.app/",
+  baseURL: process.env.NODE_ENV === 'development' ? 'http://localhost:3001/' : "https://stocksai-backend.vercel.app/",
   adapter: ['xhr', 'http']
 });
 

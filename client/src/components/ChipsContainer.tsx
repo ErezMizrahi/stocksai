@@ -16,7 +16,7 @@ const ChipsContainer = () => {
 
   return (
     <ChipsUL>
-        {user.likedSymbols.map((symbol: string) => (
+        {user.likedSymbols?.map((symbol: string) => (
           <Chip key={symbol} symbol={symbol}/>
         ))}
     </ChipsUL>
