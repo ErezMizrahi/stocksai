@@ -17,7 +17,8 @@ const Dashboard = () => {
     queryKey: [ queryKeys.myStocksData ],
     queryFn: ({signal}) => { return stocksApi.getLikedStockData(signal) },
     onError: (e: any) => {
-      if(e.response?.status === 401) {
+      console.log('ere?')
+      if(e.status === 401 || e.response.status === 401) {
         navigate('/login', { replace: true });
       }
     }

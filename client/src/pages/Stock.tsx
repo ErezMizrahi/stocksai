@@ -10,6 +10,9 @@ import { ChipsUL } from '../components/styled/Chips.styled';
 import { useNavigate } from 'react-router-dom';
 import { endpoints } from '../api/endpoints';
 import { useAuth } from '../hooks/useAuth';
+import { Card } from '../components/styled/Card.styled';
+import { Grid, RowGrid } from '../components/styled/Containers.styled';
+import InformationList from '../components/InformationList';
 
 const possibleDays = [{name: '1D', numberOfDays: 1}, {name: '5D', numberOfDays: 5},{name: '1M', numberOfDays: 30},{name: '6M', numberOfDays: 180}, {name: '1Y', numberOfDays: 365}, {name: '5Y', numberOfDays: 1825},];
 
@@ -57,36 +60,7 @@ const Stock = () => {
 
       getData();
     }, [])
-   
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const response = await stocksApi.getAskAi('AAPL');
-
-  //       const reader = response.body?.getReader(); // Get the reader from the body
-
-  //       if (reader) {
-  //         let result = '';
-
-  //         // Read chunks of data from the stream
-  //         while (true) {
-  //           const { done, value } = await reader.read();
-
-  //           if (done) {
-  //             break;
-  //           }
-
-  //           result += new TextDecoder().decode(value);
-  //           setAskAiData(result);
-  //         }
-  //       }
-  //     } catch (error) {
-  //       console.error('Error fetching streaming data:', error);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, []);
+ 
     const { data } = useQuery({
         queryKey: [ queryKeys.spesific, days ],
         queryFn: ({signal}) => {
@@ -94,13 +68,14 @@ const Stock = () => {
          },
         keepPreviousData: true,
         onError: (e: any) => {
-            if(e.response?.status === 401) {
+            if(e.status === 401 || e.response.status === 401) {
               navigate('/login', { replace: true });
             }
           }
       });
 
 
+      console.log(data)
       
 
       const mutation = useMutation({
@@ -113,7 +88,7 @@ const Stock = () => {
             queryClient.setQueryData([queryKeys.spesific, variables], newData);
         },
         onError: (e: any) => {
-            if(e.response?.status === 401) {
+            if(e.status === 401 || e.response.status === 401) {
               navigate('/login', { replace: true });
             }
           }
@@ -152,7 +127,7 @@ const Stock = () => {
             <ResponsiveContainer>
                 <LineChart
                 
-                data={data}
+                data={data?.stockData}
                 margin={{
                     top: 5,
                     right: 30,
@@ -177,7 +152,7 @@ const Stock = () => {
                 <BarChart
                 width={500}
                 height={300}
-                data={data}
+                data={data?.stockData}
                 margin={{
                     top: 5,
                     right: 30,
@@ -198,7 +173,8 @@ const Stock = () => {
             </div>
         </div>
        
-
+       <InformationList stock={stock} data={data} />
+  
 
         <NewsList symbol={stock.symbol} days={365} />
     </div>

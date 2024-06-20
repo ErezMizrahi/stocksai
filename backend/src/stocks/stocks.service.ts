@@ -4,45 +4,34 @@ import { Repository } from 'typeorm';
 import { LikedStocks } from './stock.entity';
 import { AddLikedSymbolsDto } from './dtos/addLikedSymbolsDto.dto';
 import { User } from 'src/users/user.entity';
+import { Stock } from './types/stocks.type';
+import { Bar } from './types/bar.type';
+import { ConfigService } from '@nestjs/config';
 
-export interface Stock {
-    symbol: string;
-    open: number;
-    close: number;
-    timestamp: string;
-    percent: string;
-}
-
-interface Bar {
-    Symbol: string;
-    ClosePrice: number;
-    HighPrice: number;
-    LowPrice: number;
-    TradeCount: number;
-    OpenPrice: number;
-    Timestamp: string;
-    Volume: number;
-    VWAP: number;
-}
 
 @Injectable()
 export class StocksService {
 
     constructor(
         @Inject('ALPACA') private readonly alpaca, 
+        private readonly configService: ConfigService,
         @InjectRepository(LikedStocks) private repo: Repository<LikedStocks>) {}
 
     async getSymbols(query: string) {
-        const assets = await this.alpaca.getAssets({ status: 'active' });
-        return assets
-            .filter(asset => asset.name.toLowerCase().startsWith(query) || asset.symbol.toLowerCase().startsWith(query))
-            .map(asset => {
-                console.log(asset)
-                return {
-                    symbol: asset.symbol,
-                    name: asset.name,
-                }
-            });
+        try {
+            const assets = await this.alpaca.getAssets({ status: 'active' });
+            return assets
+                .filter(asset => asset.name.toLowerCase().startsWith(query) || asset.symbol.toLowerCase().startsWith(query))
+                .map(asset => {
+                    return {
+                        symbol: asset.symbol,
+                        name: asset.name,
+                    }
+                });
+        } catch (e) {
+            console.error(e)
+        }
+       
     }
 
     async addLikedSymbols(dto: AddLikedSymbolsDto, user: User) {
@@ -56,8 +45,6 @@ export class StocksService {
             likedSymbol.user = user;
             return this.repo.save(likedSymbol);
         }
-        
-       
     }
 
     async findUser(userData: Partial<User>) {
@@ -65,64 +52,72 @@ export class StocksService {
         return existingUser;
     }
 
-
-    private async getMarketHours() {
-        const res = await this.alpaca.getClock();
-        return {
-            isOpen: res.is_open,
-            nextOpen: res.next_open
-        }
-        
+    private compareDatesWithoutTime(date1: string, date2: string): boolean {
+        const date1WithoutTime = new Date(date1).setHours(0,0,0,0);
+        const date2WithoutTime = new Date(date2).setHours(0,0,0,0);
+        return date1WithoutTime < date2WithoutTime;
     }
 
-    private getOpenDay(date: Date): number {
-        const dayOfTheWeek: number = date.getDay();
-        if (dayOfTheWeek === 0) { // Sunday
-            return 2; // Move back to Friday
-        } else if (dayOfTheWeek === 1) { // Monday
-            return 3; // Move back to Friday
-        } else if (dayOfTheWeek > 1 && dayOfTheWeek <= 5) { // Tuesday to Friday
-            return 1; // Move back to the previous day
-        } else if (dayOfTheWeek === 6) { // Saturday
-            return 1; // Move back to Friday
+
+    private async getLatestMarketDate() {
+        const date = new Date();
+        date.setDate(date.getDate() - 7);
+
+        const tradingDays = await this.alpaca.getCalendar({
+            start: date,
+            end: new Date().toISOString()
+        });
+        const lastTradingDay = tradingDays.filter(day => this.compareDatesWithoutTime(day.date, new Date().toISOString()));
+
+        return {
+            latestMarketDate: lastTradingDay[lastTradingDay.length - 1].date
         }
+        
     }
 
     async getMyStocksData(user: User) {
         const existingUser = await this.findUser(user);
-        if(!existingUser || existingUser.likedSymbols.length < 1) {
-            return [];
-        }
+        if(existingUser?.likedSymbols?.length < 1) { return []; }
         
-        const { isOpen, nextOpen } = await this.getMarketHours();
-        let days = 0;
-        const date = new Date();
+        const { latestMarketDate } = await this.getLatestMarketDate();
+        return this.getStocksData(existingUser.likedSymbols, latestMarketDate);
+    }
 
-        if(!isOpen) {
-            days = this.getOpenDay(date);
-        }
-
-        date.setDate(date.getDate() - days);
-        const yesterday = date.toISOString().split('T')[0];
-
-        const barsMap: Map<string, Bar[]> = await this.alpaca.getMultiBarsV2(existingUser.likedSymbols, {
-            start: yesterday,
+   private async getStocksData(symbols: string[], latestMarketDate: string) {
+        const barsMap: Map<string, Bar[]> = await this.alpaca.getMultiBarsV2(symbols, {
+            start: latestMarketDate,
             end: new Date().toISOString().split('T')[0] + 'T06:00:00Z',
             timeframe: '1day',
             limit: '1000',
-          });
+        });
 
-          const stocks: Stock[] = [];
-          for await (let [key, value] of barsMap) {
+        const stocks: Stock[] = [];
+        for await (let [key, value] of barsMap) {
             this.procceesStock(stocks, key, value);
-          }
+        }
 
         return stocks;
-    }
-
-   
+   }
     
     async getHistory(symbol: string, numberOfDays: number = 1) {
+        
+    }
+
+    async getStockData(symbol: string, numberOfDays: number = 1) {
+        const [ corporateData, stockData ] = await Promise.allSettled([ 
+            this.getCorporateActions(symbol, numberOfDays),
+            this.getSpesificStockData(symbol, numberOfDays)
+         ]);
+
+         return {
+            stockData: stockData.status === 'fulfilled' ? stockData.value : [],
+            corporateData: corporateData.status === 'fulfilled' ? corporateData.value : [],
+         }
+        
+
+    }
+
+    private async getSpesificStockData(symbol: string, numberOfDays: number) {
         const date = new Date();
         date.setDate(date.getDate() - numberOfDays);
 
@@ -182,15 +177,63 @@ export class StocksService {
         const date = new Date();
         date.setDate(date.getDate() - numberOfDays);
 
-        const yesterday = date.toISOString().split('T')[0];
+        const from = date.toISOString().split('T')[0];
         
         const news = await this.alpaca.getNews({ 
             symbols: [symbol],
-            start: yesterday,
+            start: from,
             end: new Date().toISOString().split('T')[0] + 'T06:00:00Z',
             sort: 'desc'
         })
 
         return news;
+    }
+
+   
+
+    private async getCorporateActions(symbol: string, numberOfDays: number) {
+        const endDateString = new Date().toISOString().split('T')[0];
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - numberOfDays);
+        const startDateString = startDate.toISOString().split('T')[0];
+
+        const actions =  await fetch(`https://data.alpaca.markets/v1beta1/corporate-actions?symbols=${symbol}&start=${startDateString}&end=${endDateString}&limit=1000&sort=asc`, {
+            headers: {
+                'APCA-API-KEY-ID': this.configService.get<string>('ALPACA_KEY'),
+                'APCA-API-SECRET-KEY': this.configService.get<string>('ALPACA_SECRET'),
+            }
+        });
+
+        const json = await actions.json();
+
+        if(json.corporate_actions.cash_dividends) {
+            json.corporate_actions.cash_dividends = json.corporate_actions.cash_dividends.map(row => {
+                return {
+                    date: row.process_date,
+                    rate: row.rate
+                }
+            })
+        }
+
+        if(json.corporate_actions.forward_splits) {
+            json.corporate_actions.forward_splits = json.corporate_actions.forward_splits.map(row => {
+                return {
+                    date: row.process_date,
+                    rate: `${row.old_rate} / ${row.new_rate}`
+                }
+            })
+        }
+
+        if(json.corporate_actions.cash_mergers) {
+            json.corporate_actions.cash_mergers = json.corporate_actions.cash_mergers.map(row => {
+                return {
+                    date: row.process_date,
+                    rate: row.rate,
+                    accuired: row.acquiree_symbol
+                }
+            })
+        }
+
+        return json.corporate_actions;
     }
 }

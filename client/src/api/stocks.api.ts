@@ -1,5 +1,5 @@
 import { Article } from "../types/Article";
-import { Stock, Ticker } from "../types/Ticker";
+import { Stock, StockPageData, Ticker } from "../types/Ticker";
 import { mapLikedStocks } from "../utils/mapLikedStocks";
 import { ApiBase } from "./api.base";
 import { endpoints } from "./endpoints";
@@ -26,8 +26,8 @@ class StocksApi extends ApiBase {
         return json.success;
     }
 
-    async getStockHistory(symbol: string, days: number = 1, signal?: AbortSignal | undefined): Promise<Stock[]> {
-        const json = await this.requestHandler<Stock[]>(endpoints.getStockHistory, { symbol, days }, signal);
+    async getStockHistory(symbol: string, days: number = 1, signal?: AbortSignal | undefined): Promise<StockPageData> {
+        const json = await this.requestHandler<StockPageData>(endpoints.getStockHistory, { symbol, days }, signal);
         if(json.error) throw new Error(json.error);
         return json.success;
     }

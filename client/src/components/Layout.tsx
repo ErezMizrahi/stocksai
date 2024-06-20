@@ -30,7 +30,7 @@ const Layout = () => {
       queryClient.invalidateQueries([queryKeys.myStocksData])
     },
     onError: (e: any) => {
-      if(e.response?.status === 401) {
+      if(e.status === 401 || e.response.status === 401) {
         navigate('/login', { replace: true });
       }
     }

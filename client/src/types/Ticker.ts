@@ -12,3 +12,7 @@ export interface Stock {
     percent: string;
 }
 
+export interface StockPageData {
+    stockData: Stock[];
+    corporateData: any;
+}

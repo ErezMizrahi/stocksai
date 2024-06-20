@@ -33,7 +33,7 @@ export class StocksController {
 
     @Get('/stock-history')
     getStockHistory(@Query('symbol') symbol: string, @Query('days') numberOfDaysAgo: number) {
-        return this.stocksService.getHistory(symbol, numberOfDaysAgo);
+        return this.stocksService.getStockData(symbol, numberOfDaysAgo);
     }
 
     @Get('/news-history')
@@ -58,4 +58,11 @@ export class StocksController {
         res.end();
   
     }
+
+
+    @Get('/stock-data')
+    async getStockData(@Query('symbol') symbol: string) {
+        return this.stocksService.getStockData(symbol);
+    }
+
 }

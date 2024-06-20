@@ -29,3 +29,12 @@ export const DashboardContainer = styled.div`
     grid-template-columns: repeat(5, 1fr);
    
 `;
+
+
+export const RowGrid = styled.div`
+    display: flex;
+    flex-direction: row;
+    align-items: start;
+    flex-wrap: wrap;
+    gap: 10px;
+`;
